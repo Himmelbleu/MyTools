@@ -10,23 +10,23 @@
 
 from PyQt5 import QtCore, QtWidgets
 
-from copyer import copy_signal_file, copy_multi_file
-from copyer.copyer_threads import OpenFileDialogThread
+from copyer import copy_signal_file
+from copyer.copyer_threads import DecryptMultiFileThread, OpenFileDialogThread
 
 
 class Ui_Copyer(object):
-
     def setupUi(self, Copyer):
         Copyer.setObjectName("Copyer")
         Copyer.resize(777, 500)
         self.main_widget = QtWidgets.QWidget(Copyer)
         self.main_widget.setObjectName("main_widget")
         self.decrypt_signal_file = QtWidgets.QRadioButton(self.main_widget)
-        self.decrypt_signal_file.setGeometry(QtCore.QRect(20, 20, 115, 19))
-        self.decrypt_signal_file.setChecked(True)
+        self.decrypt_signal_file.setGeometry(QtCore.QRect(320, 10, 115, 19))
+        self.decrypt_signal_file.setChecked(False)
         self.decrypt_signal_file.setObjectName("decrypt_signal_file")
         self.decrypt_multi_files = QtWidgets.QRadioButton(self.main_widget)
-        self.decrypt_multi_files.setGeometry(QtCore.QRect(180, 20, 211, 19))
+        self.decrypt_multi_files.setGeometry(QtCore.QRect(20, 10, 211, 19))
+        self.decrypt_multi_files.setChecked(True)
         self.decrypt_multi_files.setObjectName("decrypt_multi_files")
         self.stackedWidget = QtWidgets.QStackedWidget(self.main_widget)
         self.stackedWidget.setGeometry(QtCore.QRect(20, 50, 741, 391))
@@ -76,16 +76,16 @@ class Ui_Copyer(object):
         self.multi_file_decrypt_dest_dir_selector_btn = QtWidgets.QPushButton(self.multi_file_page)
         self.multi_file_decrypt_dest_dir_selector_btn.setGeometry(QtCore.QRect(0, 50, 121, 28))
         self.multi_file_decrypt_dest_dir_selector_btn.setObjectName("multi_file_decrypt_dest_dir_selector_btn")
-        self.multi_file_num_lcd = QtWidgets.QLCDNumber(self.multi_file_page)
-        self.multi_file_num_lcd.setGeometry(QtCore.QRect(80, 310, 64, 23))
-        self.multi_file_num_lcd.setObjectName("multi_file_num_lcd")
         self.multi_file_num_label = QtWidgets.QLabel(self.multi_file_page)
         self.multi_file_num_label.setGeometry(QtCore.QRect(0, 310, 70, 23))
         self.multi_file_num_label.setObjectName("multi_file_num_label")
         self.multi_file_decrypt_progress = QtWidgets.QProgressBar(self.multi_file_page)
-        self.multi_file_decrypt_progress.setGeometry(QtCore.QRect(0, 350, 181, 23))
+        self.multi_file_decrypt_progress.setGeometry(QtCore.QRect(180, 310, 451, 23))
         self.multi_file_decrypt_progress.setProperty("value", 0)
         self.multi_file_decrypt_progress.setObjectName("multi_file_decrypt_progress")
+        self.multi_file_num = QtWidgets.QLabel(self.multi_file_page)
+        self.multi_file_num.setGeometry(QtCore.QRect(80, 310, 72, 23))
+        self.multi_file_num.setObjectName("multi_file_num")
         self.stackedWidget.addWidget(self.multi_file_page)
         Copyer.setCentralWidget(self.main_widget)
         self.menubar = QtWidgets.QMenuBar(Copyer)
@@ -97,17 +97,18 @@ class Ui_Copyer(object):
         Copyer.setStatusBar(self.statusbar)
 
         self.retranslateUi(Copyer)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(Copyer)
 
         self.decrypt_signal_file.toggled.connect(self.on_radio_button_toggled)
         self.decrypt_multi_files.toggled.connect(self.on_radio_button_toggled)
+
         self.signal_file_selector_btn.clicked.connect(self.on_signal_file_selector)
-        self.signal_file_decrypt_dest_dir_selector_btn.clicked.connect(self.on_signal_file_decrypt_dest_dir_selector)
+        self.signal_file_decrypt_dest_dir_selector_btn.clicked.connect(self.on_signal_file_decrypt_des_dir_selector)
         self.start_decrypt_signal_file.clicked.connect(self.on_start_decrypt_signal_file)
 
         self.multi_file_dir_selector_btn.clicked.connect(self.on_multi_file_dir_selector_btn)
-        self.multi_file_decrypt_dest_dir_selector_btn.clicked.connect(self.on_multi_file_decrypt_dest_dir_selector)
+        self.multi_file_decrypt_dest_dir_selector_btn.clicked.connect(self.on_multi_file_decrypt_des_dir_selector)
         self.start_decrypt_multi_file.clicked.connect(self.on_start_decrypt_multi_file)
 
     def on_radio_button_toggled(self):
@@ -118,15 +119,15 @@ class Ui_Copyer(object):
 
     def on_signal_file_selector(self):
         self.open_file_dialog_thread = OpenFileDialogThread()
-        self.open_file_dialog_thread.signal.connect(lambda x: {
+        self.open_file_dialog_thread.updator.connect(lambda x: {
             self.signal_file_label.setText(x)
         })
         self.open_file_dialog_thread.file_type = "1"
         self.open_file_dialog_thread.start()
 
-    def on_signal_file_decrypt_dest_dir_selector(self):
+    def on_signal_file_decrypt_des_dir_selector(self):
         self.open_file_dialog_thread = OpenFileDialogThread()
-        self.open_file_dialog_thread.signal.connect(lambda x: {
+        self.open_file_dialog_thread.updator.connect(lambda x: {
             self.signal_file_dest_dir_label.setText(x)
         })
         self.open_file_dialog_thread.file_type = "2"
@@ -142,29 +143,31 @@ class Ui_Copyer(object):
 
     def on_multi_file_dir_selector_btn(self):
         self.open_file_dialog_thread = OpenFileDialogThread()
-        self.open_file_dialog_thread.signal.connect(lambda x: {
+        self.open_file_dialog_thread.updator.connect(lambda x: {
             self.multi_file_dir_label.setText(x)
         })
         self.open_file_dialog_thread.file_type = "2"
         self.open_file_dialog_thread.start()
 
-    def on_multi_file_decrypt_dest_dir_selector(self):
+    def on_multi_file_decrypt_des_dir_selector(self):
         self.open_file_dialog_thread = OpenFileDialogThread()
-        self.open_file_dialog_thread.signal.connect(lambda x: {
+        self.open_file_dialog_thread.updator.connect(lambda x: {
             self.multi_file_dest_dir_label.setText(x)
         })
         self.open_file_dialog_thread.file_type = "2"
         self.open_file_dialog_thread.start()
 
     def on_start_decrypt_multi_file(self):
-        copy_multi_file.decrypt_multi_file(self.multi_file_dir_label.text(),
-                                           self.multi_file_dest_dir_label.text(),
-                                           self.on_start_decrypt_multi_file_callback)
+        source_folder = self.multi_file_dir_label.text()
+        des_folder = self.multi_file_dest_dir_label.text()
+        self.decrypt_multi_file_thread = DecryptMultiFileThread(source_folder, des_folder)
+        self.decrypt_multi_file_thread.updator.connect(self.after_decrypt_multi_file_thread_signal)
+        self.decrypt_multi_file_thread.start()
 
-    def on_start_decrypt_multi_file_callback(self, count, files, source_file, dest_file):
-        self.multi_file_num_lcd.display(count)
-        self.multi_file_textarea.append(
-            f"文件 '{source_file}' 已复制到目标目录 '{dest_file}' 中。\n")
+    def after_decrypt_multi_file_thread_signal(self, data):
+        self.multi_file_decrypt_progress.setValue(data['progress'])
+        self.multi_file_num.setText(data['file_count'])
+        self.multi_file_textarea.append(data['text'])
 
     def retranslateUi(self, Copyer):
         _translate = QtCore.QCoreApplication.translate
@@ -178,3 +181,4 @@ class Ui_Copyer(object):
         self.multi_file_dir_selector_btn.setText(_translate("Copyer", "选择文件夹"))
         self.multi_file_decrypt_dest_dir_selector_btn.setText(_translate("Copyer", "选择解密位置"))
         self.multi_file_num_label.setText(_translate("Copyer", "文件个数"))
+        self.multi_file_num.setText(_translate("Copyer", "0"))

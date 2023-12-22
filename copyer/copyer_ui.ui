@@ -17,8 +17,8 @@
    <widget class="QRadioButton" name="decrypt_signal_file">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>20</y>
+      <x>320</x>
+      <y>10</y>
       <width>115</width>
       <height>19</height>
      </rect>
@@ -27,20 +27,23 @@
      <string>解密单个文件</string>
     </property>
     <property name="checked">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
    </widget>
    <widget class="QRadioButton" name="decrypt_multi_files">
     <property name="geometry">
      <rect>
-      <x>180</x>
-      <y>20</y>
+      <x>20</x>
+      <y>10</y>
       <width>211</width>
       <height>19</height>
      </rect>
     </property>
     <property name="text">
      <string>解密文件夹下所有文件</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QStackedWidget" name="stackedWidget">
@@ -53,7 +56,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="signal_file_page">
      <widget class="QPushButton" name="signal_file_selector_btn">
@@ -208,16 +211,6 @@
        <string>选择解密位置</string>
       </property>
      </widget>
-     <widget class="QLCDNumber" name="multi_file_num_lcd">
-      <property name="geometry">
-       <rect>
-        <x>80</x>
-        <y>310</y>
-        <width>64</width>
-        <height>23</height>
-       </rect>
-      </property>
-     </widget>
      <widget class="QLabel" name="multi_file_num_label">
       <property name="geometry">
        <rect>
@@ -234,14 +227,39 @@
      <widget class="QProgressBar" name="multi_file_decrypt_progress">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>350</y>
-        <width>181</width>
+        <x>180</x>
+        <y>310</y>
+        <width>451</width>
         <height>23</height>
        </rect>
       </property>
       <property name="value">
        <number>0</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="multi_file_num">
+      <property name="geometry">
+       <rect>
+        <x>80</x>
+        <y>310</y>
+        <width>72</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLabel { color: rgb(170, 0, 0); }</string>
+      </property>
+      <property name="text">
+       <string>0</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
      </widget>
     </widget>
