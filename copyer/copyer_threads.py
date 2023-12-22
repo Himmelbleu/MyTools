@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QFileDialog
 
-from copyer import copy_multi_file
+import copy_multi_file
 
 
 class OpenFileDialogThread(QtCore.QThread):

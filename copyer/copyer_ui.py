@@ -9,9 +9,10 @@
 
 
 from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
-from copyer import copy_signal_file
-from copyer.copyer_threads import DecryptMultiFileThread, OpenFileDialogThread
+import copy_signal_file
+import copyer_threads
 
 
 class Ui_Copyer(object):
@@ -118,7 +119,7 @@ class Ui_Copyer(object):
             self.stackedWidget.setCurrentIndex(1)
 
     def on_signal_file_selector(self):
-        self.open_file_dialog_thread = OpenFileDialogThread()
+        self.open_file_dialog_thread = copyer_threads.OpenFileDialogThread()
         self.open_file_dialog_thread.updator.connect(lambda x: {
             self.signal_file_label.setText(x)
         })
@@ -126,7 +127,7 @@ class Ui_Copyer(object):
         self.open_file_dialog_thread.start()
 
     def on_signal_file_decrypt_des_dir_selector(self):
-        self.open_file_dialog_thread = OpenFileDialogThread()
+        self.open_file_dialog_thread = copyer_threads.OpenFileDialogThread()
         self.open_file_dialog_thread.updator.connect(lambda x: {
             self.signal_file_dest_dir_label.setText(x)
         })
@@ -134,15 +135,20 @@ class Ui_Copyer(object):
         self.open_file_dialog_thread.start()
 
     def on_start_decrypt_signal_file(self):
-        copy_signal_file.decrypt_signal_file(self.signal_file_label.text(),
-                                             self.signal_file_dest_dir_label.text(),
-                                             lambda source_file, destination_folder: {
-                                                 self.signal_file_textarea.append(
-                                                     f"文件 '{source_file}' 已复制到目标目录 '{destination_folder}' 中。\n")
-                                             })
+        source_folder = self.signal_file_label.text()
+        des_folder = self.signal_file_dest_dir_label.text()
+        if not source_folder or not des_folder:
+            QMessageBox(QMessageBox.Warning, '提示', '没有选择文件或文件解压存放位置！').exec_()
+        else:
+            copy_signal_file.decrypt_signal_file(source_folder,
+                                                 des_folder,
+                                                 lambda source_file, destination_folder: {
+                                                     self.signal_file_textarea.append(
+                                                         f"文件 '{source_file}' 已复制到目标目录 '{destination_folder}' 中。\n")
+                                                 })
 
     def on_multi_file_dir_selector_btn(self):
-        self.open_file_dialog_thread = OpenFileDialogThread()
+        self.open_file_dialog_thread = copyer_threads.OpenFileDialogThread()
         self.open_file_dialog_thread.updator.connect(lambda x: {
             self.multi_file_dir_label.setText(x)
         })
@@ -150,7 +156,7 @@ class Ui_Copyer(object):
         self.open_file_dialog_thread.start()
 
     def on_multi_file_decrypt_des_dir_selector(self):
-        self.open_file_dialog_thread = OpenFileDialogThread()
+        self.open_file_dialog_thread = copyer_threads.OpenFileDialogThread()
         self.open_file_dialog_thread.updator.connect(lambda x: {
             self.multi_file_dest_dir_label.setText(x)
         })
@@ -160,9 +166,12 @@ class Ui_Copyer(object):
     def on_start_decrypt_multi_file(self):
         source_folder = self.multi_file_dir_label.text()
         des_folder = self.multi_file_dest_dir_label.text()
-        self.decrypt_multi_file_thread = DecryptMultiFileThread(source_folder, des_folder)
-        self.decrypt_multi_file_thread.updator.connect(self.after_decrypt_multi_file_thread_signal)
-        self.decrypt_multi_file_thread.start()
+        if not source_folder or not des_folder:
+            QMessageBox(QMessageBox.Warning, '提示', '没有选择文件夹路径或文件解压存放位置！').exec_()
+        else:
+            self.decrypt_multi_file_thread = copyer_threads.DecryptMultiFileThread(source_folder, des_folder)
+            self.decrypt_multi_file_thread.updator.connect(self.after_decrypt_multi_file_thread_signal)
+            self.decrypt_multi_file_thread.start()
 
     def after_decrypt_multi_file_thread_signal(self, data):
         self.multi_file_decrypt_progress.setValue(data['progress'])
