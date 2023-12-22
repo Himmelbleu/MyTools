@@ -17,19 +17,28 @@ def count_files_in_directory(directory):
 
 
 def decrypt_multi_file(source_folder, des_folder, callback):
-    file_total = count_files_in_directory(source_folder)
+    file_total = sum(len(files) for _, _, files in os.walk(source_folder))
     file_count = 0
-    if not os.path.exists(des_folder):
-        os.makedirs(des_folder)
+    try:
+        # 遍历源文件夹
+        for root, dirs, files in os.walk(source_folder):
+            # 获取相对路径
+            relative_path = os.path.relpath(root, source_folder)
+            # 构建目标文件夹中的对应路径
+            target_folder = os.path.join(des_folder, relative_path)
 
-    for root, dirs, files in os.walk(source_folder):
-        des_root = root.replace(source_folder, des_folder, 1)
-        if not os.path.exists(des_root):
-            os.makedirs(des_root)
+            # 确保目标文件夹存在，如果不存在则创建
+            if not os.path.exists(target_folder):
+                os.makedirs(target_folder)
 
-        for file in files:
-            source_file = os.path.join(str(root), str(file))
-            des_file = os.path.join(str(des_root), str(file))
-            shutil.copy2(source_file, des_file)
-            file_count += 1
-            callback(file_count, file_total, source_file, des_file)
+            # 复制文件并将内容写入对应的目标文件
+            for file in files:
+                src_file_path = os.path.join(root, file)
+                dst_file_path = os.path.join(target_folder, file)
+
+                # 复制文件内容
+                shutil.copy(src_file_path, dst_file_path)
+                file_count += 1
+                callback(file_count, file_total, source_folder, des_folder, '')
+    except (shutil.Error, OSError) as e:
+        callback(file_count, file_total, source_folder, des_folder, e)

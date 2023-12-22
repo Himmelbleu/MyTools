@@ -138,14 +138,13 @@ class Ui_Copyer(object):
         source_folder = self.signal_file_label.text()
         des_folder = self.signal_file_dest_dir_label.text()
         if not source_folder or not des_folder:
-            QMessageBox(QMessageBox.Warning, '提示', '没有选择文件或文件解压存放位置！').exec_()
+            QMessageBox(QMessageBox.Warning, '提示', '请选择文件和文件解压位置！').exec_()
         else:
-            copy_signal_file.decrypt_signal_file(source_folder,
-                                                 des_folder,
-                                                 lambda source_file, destination_folder: {
-                                                     self.signal_file_textarea.append(
-                                                         f"文件 '{source_file}' 已复制到目标目录 '{destination_folder}' 中。\n")
-                                                 })
+            copy_signal_file.decrypt_signal_file(source_folder, des_folder, self.after_decrypt_signal_file)
+
+    def after_decrypt_signal_file(self, data):
+        self.signal_file_textarea.append(
+            f"文件 '{data['source_file']}' 已复制到目标目录 '{data['des_folder']}' 中......\n")
 
     def on_multi_file_dir_selector_btn(self):
         self.open_file_dialog_thread = copyer_threads.OpenFileDialogThread()
@@ -167,16 +166,18 @@ class Ui_Copyer(object):
         source_folder = self.multi_file_dir_label.text()
         des_folder = self.multi_file_dest_dir_label.text()
         if not source_folder or not des_folder:
-            QMessageBox(QMessageBox.Warning, '提示', '没有选择文件夹路径或文件解压存放位置！').exec_()
+            QMessageBox(QMessageBox.Warning, '提示', '请选择文件夹路径和文件解压位置！').exec_()
         else:
             self.decrypt_multi_file_thread = copyer_threads.DecryptMultiFileThread(source_folder, des_folder)
-            self.decrypt_multi_file_thread.updator.connect(self.after_decrypt_multi_file_thread_signal)
+            self.decrypt_multi_file_thread.updator.connect(self.after_decrypt_multi_file_thread)
             self.decrypt_multi_file_thread.start()
 
-    def after_decrypt_multi_file_thread_signal(self, data):
+    def after_decrypt_multi_file_thread(self, data):
         self.multi_file_decrypt_progress.setValue(data['progress'])
         self.multi_file_num.setText(data['file_count'])
         self.multi_file_textarea.append(data['text'])
+        if data['e']:
+            QMessageBox(QMessageBox.Warning, '错误', str(data['e'])).exec_()
 
     def retranslateUi(self, Copyer):
         _translate = QtCore.QCoreApplication.translate

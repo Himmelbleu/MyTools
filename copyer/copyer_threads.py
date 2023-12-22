@@ -32,11 +32,12 @@ class DecryptMultiFileThread(QtCore.QThread):
     def run(self):
         copy_multi_file.decrypt_multi_file(self.source_folder, self.des_folder, self.exe_callback)
 
-    def exe_callback(self, file_count, file_total, source_file, des_file):
+    def exe_callback(self, file_count, file_total, source_file, des_file, e):
         self.updator.emit({
             'file_count': str(file_count),
             'progress': round((file_count / file_total) * 100),
             'source_file': source_file,
             'des_file': des_file,
-            'text': f"文件 '{source_file}' 已复制到目标目录 '{des_file}' 中。\n"
+            'text': f"第 {file_count} 个文件正在解密中.......\n",
+            'e': e
         })

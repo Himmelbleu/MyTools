@@ -2,9 +2,19 @@ import os
 import shutil
 
 
-def decrypt_signal_file(source_file, destination_folder, fnc):
-    if not os.path.exists(destination_folder):
-        os.makedirs(destination_folder)
+def decrypt_signal_file(source_file, des_folder, callback):
+    try:
+        if not os.path.exists(des_folder):
+            os.makedirs(des_folder)
 
-    shutil.copy(source_file, destination_folder)
-    fnc(source_file, destination_folder)
+        shutil.copy(source_file, des_folder)
+        callback({
+            'source_file': source_file,
+            'des_folder': des_folder
+        })
+    except (shutil.Error, OSError) as e:
+        callback({
+            'source_file': source_file,
+            'des_folder': des_folder,
+            'e': e
+        })
