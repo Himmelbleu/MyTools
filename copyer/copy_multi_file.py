@@ -36,8 +36,11 @@ def decrypt_multi_file(source_folder, des_folder, callback):
                 src_file_path = os.path.join(root, file)
                 dst_file_path = os.path.join(target_folder, file)
 
-                # 复制文件内容
-                shutil.copy(src_file_path, dst_file_path)
+                with open(src_file_path, 'rb') as source_file:
+                    with open(dst_file_path, 'wb') as des_file:
+                        content = source_file.read()
+                        des_file.write(content)
+
                 file_count += 1
                 callback(file_count, file_total, source_folder, des_folder, '')
     except (shutil.Error, OSError) as e:
