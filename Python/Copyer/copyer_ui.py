@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'd:\Projects\py_tools\copyer\copyer_ui.ui'
+# Form implementation generated from reading ui file 'd:\Projects\py_tools\Copyer\copyer_ui.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.10
 #
