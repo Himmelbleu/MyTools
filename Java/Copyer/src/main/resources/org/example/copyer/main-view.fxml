@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<VBox fx:id="root" xmlns:fx="http://javafx.com/fxml" alignment="CENTER" spacing="20.0"
+      fx:controller="org.example.copyer.MainController" onDragOver="#initialize">
+
+    <Label text="将文件拖动到此处"/>
+    <Label fx:id="filePathText"/>
+
+</VBox>
