@@ -2,9 +2,9 @@ package org.example.copyer;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
-import javafx.scene.layout.VBox;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,55 +13,51 @@ import java.io.InputStream;
 
 public class MainController {
 
+    private final StringBuilder message = new StringBuilder();
     @FXML
-    private VBox root;
-
+    private Label dragFileArea;
     @FXML
-    private Label filePathText;
+    private TextArea textArea;
 
     @FXML
     private void initialize() {
-        root.setOnDragOver(event -> {
-            if (event.getGestureSource() != root && event.getDragboard().hasFiles()) {
+        dragFileArea.setOnDragOver(event -> {
+            if (event.getGestureSource() != dragFileArea && event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
             event.consume();
         });
 
-        root.setOnDragDropped(event -> {
+        dragFileArea.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
+            DirectoryCopier co = new DirectoryCopier();
             boolean success = false;
             if (db.hasFiles()) {
                 success = true;
-                String filePath = null;
+                String filePath;
                 for (File file : db.getFiles()) {
                     filePath = file.getAbsolutePath();
-                    try (InputStream inputStream = new FileInputStream(file)) {
-                        byte[] data = inputStream.readAllBytes();
-                        // 这里可以处理获取到的二进制数据 data
-                        System.out.println("File path: " + filePath);
-                        System.out.println("Binary data: " + bytesToHex(data)); // 将二进制数据转换成十六进制字符串输出
-                    } catch (IOException e) {
-                        e.fillInStackTrace();
+                    message.append(filePath).append("\n");
+                    if (file.isDirectory()) {
+                        try {
+                            co.copyFolder(new File(filePath), new File(filePath + co.getSuffix()));
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else {
+                        try (InputStream inputStream = new FileInputStream(file)) {
+                            byte[] data = inputStream.readAllBytes();
+                            co.copyFile(file, data);
+                        } catch (IOException e) {
+                            e.fillInStackTrace();
+                        }
                     }
                 }
-                filePathText.setText("文件路径: " + filePath);
+                textArea.setText(message.toString());
             }
             event.setDropCompleted(success);
             event.consume();
         });
-    }
-
-    private static String bytesToHex(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte aByte : bytes) {
-            String hex = Integer.toHexString(0xff & aByte);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
-        }
-        return hexString.toString();
     }
 
 }

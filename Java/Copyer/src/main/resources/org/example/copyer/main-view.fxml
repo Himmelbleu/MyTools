@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.layout.VBox?>
-<VBox fx:id="root" xmlns:fx="http://javafx.com/fxml" alignment="CENTER" spacing="20.0"
-      fx:controller="org.example.copyer.MainController" onDragOver="#initialize">
-
-    <Label text="将文件拖动到此处"/>
-    <Label fx:id="filePathText"/>
-
+<?import javafx.scene.text.Font?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" id="root" fx:id="root" alignment="CENTER" prefHeight="318.0"
+      prefWidth="395.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/8"
+      fx:controller="org.example.copyer.MainController">
+    <children>
+        <Label fx:id="dragFileArea" alignment="CENTER" contentDisplay="CENTER" onDragOver="#initialize"
+               prefHeight="207.0" prefWidth="395.0" text="将文件拖动到此处" textFill="WHITE">
+            <font>
+                <Font size="24.0"/>
+            </font>
+        </Label>
+        <VBox alignment="CENTER" prefHeight="100.0" prefWidth="395.0">
+            <cursor>
+                <Cursor fx:constant="NONE"/>
+            </cursor>
+        </VBox>
+        <TextArea fx:id="textArea" editable="false" prefHeight="200.0" prefWidth="200.0"/>
+    </children>
 </VBox>
